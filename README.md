@@ -24,6 +24,20 @@ An application that will recognize "face" and fire an API to the backend with 3 
    pip install -r requirements.txt
    ```
 
+## APP INSTANTIATION
+
+1. Run the FASTAPI APP instance
+
+   ```python
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
+   ```
+
+2. Ensure localhost connectivity (port - 3306), then run the below to perform migration(s)
+
+   ```python
+   alembic upgrade head
+   ```
+
 ## CORE PROCESS
 
 1. Capture the required person face images as part of data processing activity

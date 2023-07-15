@@ -14,7 +14,7 @@ def capture_images(person_name, num_images):
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord("c"):
-            image_path = os.path.join(image_folder,f"{person_name}_{image_count}.jpg")
+            image_path = os.path.join(image_folder, f"{person_name}_{image_count}.jpg")
             print(image_path)
             cv2.imwrite(image_path, frame)  # Save the image
             image_count += 1
@@ -27,5 +27,6 @@ def capture_images(person_name, num_images):
     cv2.destroyAllWindows()  # Close all windows
 
 
-# Usage:
-capture_images("Abhi", 10)
+if __name__ == "__main__":
+    user_name = input("Please enter name to save the image: ")
+    capture_images(user_name, 10)

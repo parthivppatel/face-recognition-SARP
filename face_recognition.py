@@ -2,8 +2,9 @@ import cv2
 from face_data_api import send_api_request, get_latest_timestamp
 import subprocess
 from dotenv import load_dotenv
-import os
+import os, sys
 from datetime import datetime
+import time
 
 load_dotenv()
 
@@ -51,14 +52,26 @@ while True:
             confidence = "  {0}%".format(round(100 - confidence))
             device_id = subprocess.check_output("hostname").decode().strip()
             current_time_stamp = datetime.now()
-            prev_time_stamp = get_latest_timestamp(id)
-            print(prev_time_stamp)
-            # time_diff = int((current_time_stamp - prev_time_stamp).total_seconds())
-            # api_call = time_interval * 60 > time_diff
+            prev_time_stamp = get_latest_timestamp(device_id, id)
+            try:
+                date_string = prev_time_stamp.split("T")[1]
+                date_string = date_string.split('"')[0]
+                prev_time_stamp = datetime.strptime(date_string, "%H:%M:%S").time()
+                prev_time_stamp = datetime.combine(
+                    datetime.today().date(), prev_time_stamp
+                )
+                time_diff = int((current_time_stamp - prev_time_stamp).total_seconds())
 
-            if not api_call:
-                api_response = send_api_request(device_id, id)
-                api_call = True
+                if time_interval * 60 > time_diff:
+                    sys.exit()
+            except Exception as e:
+                print(f"Error: str{e}")
+
+            api_response = send_api_request(device_id, id)
+            if api_response:
+                cam.release()
+                cv2.destroyAllWindows()
+                sys.exit()
 
         else:
             user_name = "unknown"
@@ -68,6 +81,7 @@ while True:
         cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
 
     cv2.imshow("camera", img)
+
     k = cv2.waitKey(10) & 0xFF  # Press 'ESC' for exiting video
     if k == 27:
         break

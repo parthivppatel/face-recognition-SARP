@@ -6,7 +6,7 @@ try:
         host="localhost",
         user="root",
         # database="face_rec",
-        password="root@123"
+        password="root",
     )
 
     # Create a cursor object to interact with the database
@@ -28,4 +28,3 @@ try:
 
 except mysql.connector.Error as error:
     print("Error while connecting to MySQL:", error)
-

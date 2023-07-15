@@ -1,9 +1,10 @@
 import cv2
+import os
 
 
 def capture_images(person_name, num_images):
-    camera = cv2.VideoCapture(0)  # Open the camera
-
+    camera = cv2.VideoCapture(0)  # Open the camera 1 stand to font camara
+    image_folder = "input_images"
     image_count = 0
 
     while True:
@@ -13,7 +14,9 @@ def capture_images(person_name, num_images):
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord("c"):
-            cv2.imwrite(f"{person_name}_{image_count}.jpg", frame)  # Save the image
+            image_path = os.path.join(image_folder,f"{person_name}_{image_count}.jpg")
+            print(image_path)
+            cv2.imwrite(image_path, frame)  # Save the image
             image_count += 1
             print(f"Image {image_count}/{num_images} captured.")
 
@@ -25,4 +28,4 @@ def capture_images(person_name, num_images):
 
 
 # Usage:
-capture_images("Abhi", 10)
+capture_images("Abhi", 1)

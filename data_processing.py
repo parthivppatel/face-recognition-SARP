@@ -28,4 +28,4 @@ def capture_images(person_name, num_images):
 
 
 # Usage:
-capture_images("Abhi", 1)
+capture_images("Abhi", 10)

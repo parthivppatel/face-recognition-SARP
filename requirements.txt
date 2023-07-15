@@ -1,6 +1,6 @@
 alembic==1.8.0
 fastapi==0.78.0
-SQLAlchemy==1.4.37
+SQLAlchemy==1.4.49
 uvicorn==0.17.6
 dlib==19.24.2
 filelock==3.12.2

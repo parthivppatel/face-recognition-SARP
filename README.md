@@ -29,7 +29,7 @@ An application that will recognize "face" and fire an API to the backend with 3 
 1. Capture the required person face images as part of data processing activity
 
    ```python
-   python face_data_processing.py
+   python face_data_capture.py
    ```
 
 2. Train the model using the newly captured images

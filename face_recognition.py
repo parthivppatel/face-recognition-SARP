@@ -29,6 +29,8 @@ cam = cv2.VideoCapture(0)
 cam.set(3, 640)  # set video widht
 cam.set(4, 480)  # set video height
 
+last_recognized_time = {}
+
 # Define min window size to be recognized as a face
 minW = 0.1 * cam.get(3)
 minH = 0.1 * cam.get(4)
@@ -51,27 +53,34 @@ while True:
             user_name = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
             device_id = subprocess.check_output("hostname").decode().strip()
-            current_time_stamp = datetime.now()
-            prev_time_stamp = get_latest_timestamp(device_id, id)
-            try:
-                date_string = prev_time_stamp.split("T")[1]
-                date_string = date_string.split('"')[0]
-                prev_time_stamp = datetime.strptime(date_string, "%H:%M:%S").time()
-                prev_time_stamp = datetime.combine(
-                    datetime.today().date(), prev_time_stamp
-                )
-                time_diff = int((current_time_stamp - prev_time_stamp).total_seconds())
+            current_time_stamp = time.time()
 
-                if time_interval * 60 > time_diff:
-                    sys.exit()
+            # prev_time_stamp = get_latest_timestamp(device_id, id)
+            try:
+                last_recognized_timestamp = last_recognized_time.get(id)
+                if id and (not last_recognized_timestamp or current_time_stamp - last_recognized_timestamp >= time_interval *60):
+                # if not api_call:
+                    api_response = send_api_request(device_id, id)
+                    if api_response:
+                        cv2.putText(img, user_name, (x + 5, y - 5), font, 1, (255, 255, 255), 2)
+                        cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+                        last_recognized_time[id]=current_time_stamp
+                        # cv2.destroyAllWindows()
+                        # sys.exit()
+                        # date_string = prev_time_stamp.split("T")[1]
+                        # date_string = date_string.split('"')[0]
+                        # prev_time_stamp = datetime.strptime(date_string, "%H:%M:%S").time()
+                        # prev_time_stamp = datetime.combine(
+                        #     datetime.today().date(), prev_time_stamp
+                        # )
+                        # time_diff = int((current_time_stamp - first_time).total_seconds())
+                
+                        # print('time_diff')
+                        #     if time_interval * 60 > time_diff:
+                        #         sys.exit()
             except Exception as e:
                 print(f"Error: str{e}")
 
-            api_response = send_api_request(device_id, id)
-            if api_response:
-                cam.release()
-                cv2.destroyAllWindows()
-                sys.exit()
 
         else:
             user_name = "unknown"

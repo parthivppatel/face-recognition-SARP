@@ -1,7 +1,7 @@
 import requests
 
-api_url_post = "http://localhost:5000/face-data"
-api_url_get = "http://localhost:5000/get-time-stamp"
+api_url_post = "http://localhost:8000/face-data"
+api_url_get = "http://localhost:8000/get-time-stamp"
 headers = {"Content-Type": "application/json"}
 
 

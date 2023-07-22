@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
-from .databaseutils import get_db
-from .schemas.face import FaceData, FaceID
-from .models.face import FaceCapture
+from databaseutils import get_db
+from schemas.face import FaceData, FaceID
+from models.face import FaceCapture
 from datetime import datetime
 
 app = FastAPI()

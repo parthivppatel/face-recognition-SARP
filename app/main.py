@@ -44,7 +44,11 @@ def captureFace(FaceData: FaceData, db: Session = Depends(get_db)):
             .first()
         )
 
+        if time_stamp is not None:
+            timestamp_value = time_stamp[0]  # Extract the first element of the tuple
+            return {"timestamp": timestamp_value}
+        else:
+            return HTTPException(404, "Timestamp not found")
+
     except:
         raise HTTPException(500, "Something Went Wrong")
-
-    return time_stamp

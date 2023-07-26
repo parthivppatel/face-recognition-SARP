@@ -4,68 +4,60 @@ import subprocess
 from dotenv import load_dotenv
 import os, sys
 from datetime import datetime
-import time
+import dlib
 
 load_dotenv()
 
 time_interval = int(os.getenv("TIME_INTERVAL"))
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 recognizer.read("trainer/trainer.yml")
-cascadePath = "cascades/haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascadePath)
+
+# Initialize dlib face detector
+face_detector = dlib.get_frontal_face_detector()
+
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-# iniciate id counter
-id = 0
-
-# API call status
-api_call = False
-
-# names related to ids: example ==> Marcelo: id=1,  etc
+# Names related to ids: example ==> John: id=1,  etc
 names = ["None", "Sarma", "Abhi", "Ravin", "Parthiv"]
 
 # Initialize and start realtime video capture
 cam = cv2.VideoCapture(0)
-cam.set(3, 640)  # set video widht
-cam.set(4, 480)  # set video height
 
-# Define min window size to be recognized as a face
-minW = 0.1 * cam.get(3)
-minH = 0.1 * cam.get(4)
 while True:
     ret, img = cam.read()
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.2,
-        minNeighbors=5,
-        minSize=(int(minW), int(minH)),
-    )
-    for x, y, w, h in faces:
+    # Detect faces using the dlib detector
+    faces = face_detector(gray)
+
+    for face in faces:
+        # Convert dlib rectangle to OpenCV rectangle format
+        x, y, w, h = face.left(), face.top(), face.width(), face.height()
+
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         id, confidence = recognizer.predict(gray[y : y + h, x : x + w])
 
-        # If confidence is less than 100 ==> "0" : perfect match
-        if confidence < 50:
+        # Face match basis the confidence level
+        if confidence < 70:
             user_name = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
             device_id = subprocess.check_output("hostname").decode().strip()
             current_time_stamp = datetime.now()
             prev_time_stamp = get_latest_timestamp(device_id, id)
-            try:
-                date_string = prev_time_stamp.split("T")[1]
-                date_string = date_string.split('"')[0]
-                prev_time_stamp = datetime.strptime(date_string, "%H:%M:%S").time()
-                prev_time_stamp = datetime.combine(
-                    datetime.today().date(), prev_time_stamp
-                )
-                time_diff = int((current_time_stamp - prev_time_stamp).total_seconds())
+            if prev_time_stamp:
+                try:
+                    prev_time_stamp = datetime.fromisoformat(prev_time_stamp).strftime(
+                        "%H:%M:%S"
+                    )
+                    str_time = datetime.strptime(prev_time_stamp, "%H:%M:%S").time()
+                    actual_time = datetime.combine(datetime.today().date(), str_time)
+                    time_diff = int((current_time_stamp - actual_time).total_seconds())
 
-                if time_interval * 60 > time_diff:
-                    sys.exit()
-            except Exception as e:
-                print(f"Error: str{e}")
+                    if time_interval * 60 > time_diff:
+                        sys.exit()
+
+                except Exception as e:
+                    print(f"Error: {str(e)}")
 
             api_response = send_api_request(device_id, id)
             if api_response:

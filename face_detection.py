@@ -30,7 +30,7 @@ while True:
         id, confidence = recognizer.predict(gray[y : y + h, x : x + w])
 
         # Face match basis the confidence level
-        if confidence < 70:
+        if confidence < 60:
             user_name = names[id]
             confidence = "  {0}%".format(round(100 - confidence))
         else:

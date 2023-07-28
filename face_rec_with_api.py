@@ -151,7 +151,7 @@ class FaceRecognition:
                     name.capitalize(),
                     (left + 6, bottom - 6),
                     cv2.FONT_HERSHEY_DUPLEX,
-                    1,
+                    0.8,
                     (255, 255, 255),
                     1,
                 )
